@@ -1,0 +1,30 @@
+
+build:
+  stage: build
+  image: trion/ng-cli
+  before_script:
+    - npm ci
+  script:
+    - ng build --prod
+  artifacts:
+    expire_in: 2h30min
+    paths:
+      - dist
+    
+deploy:
+  stage: deploy
+  dependencies: 
+    - build
+  script:
+  - apt-get update -qq
+  - apt-get install -qq git
+  - apt-get install -qq rsync
+  # Setup SSH deploy keys
+  - 'which ssh-agent || ( apt-get install -qq openssh-client )'
+  - eval $(ssh-agent -s)
+  - ssh-add <(echo "$SSH_PRIVATE_KEY")
+  - mkdir -p ~/.ssh
+  - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
+  - cd dist/heatmap
+  - rsync -r . ubuntu@3.95.15.232:/home/ubuntu/frontend
+  - ssh ubuntu@3.95.15.232  'sudo cp -a /home/ubuntu/frontend/. /var/www/html/'

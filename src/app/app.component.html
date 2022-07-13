@@ -1,0 +1,15 @@
+<div style="display: flex; padding:10px" >
+    <div style="width: 250px">
+        <h4>
+            {{title}}
+        </h4>
+        <app-data-table [data]="fieldData" ></app-data-table>
+        <h4>
+            Detected Objects
+        </h4>
+        <app-data-table [data]="objectsData" ></app-data-table>
+    </div>
+    <div id="map">
+
+    </div>
+</div>
